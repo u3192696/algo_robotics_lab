@@ -11,7 +11,7 @@
 motion_model:
   ros__parameters:
     # Source of raw wheel odometry.
-    odom_topic: "/succulence/odom"          # physical: "/odom"
+    odom_topic: "/odom"          # physical: "/odom"
 
     dead_reckoning:
       # Where the dead-reckoned pose is republished for downstream nodes.
@@ -21,8 +21,8 @@ motion_model:
 
     frames:
       # TF frame names. Must match what the robot driver publishes.
-      odom_frame: "succulence/odom"          # physical: "odom"
-      base_link_frame: "succulence/base_link"  # physical: "base_link"
+      odom_frame: "odom"          # physical: "odom"
+      base_link_frame: "base_link"  # physical: "base_link"
       map_frame: "map"
 
     # Lidar mounting offset (base_link -> lidar). Default (0, 0, 0) works
@@ -72,7 +72,7 @@ motion_model:
 occupancy_grid_mapper:
   ros__parameters:
     # 2D laser scan input.
-    scan_topic: "/succulence/scan"          # physical: "/scan"
+    scan_topic: "/scan"          # physical: "/scan"
 
     # Pose source used to project scans into the world frame. The mapper
     # uses dead-reckoning here (no SLAM correction) — that is intentional,
@@ -91,20 +91,20 @@ occupancy_grid_mapper:
       # Cell size in metres. Drives every other grid dimension.
       # Larger: coarser map, less RAM, A* path is blockier.
       # Smaller: finer map, RAM usage scales as 1/resolution^2.
-      resolution: 0.10
+      resolution: 0.05
 
       # Grid size in cells. Total covered area = width * resolution metres.
       # Larger: covers more terrain, more memory.
       # Smaller: smaller world, may clip off-grid scans.
-      width: 1250
-      height: 875
+      width: 60
+      height: 60
 
       # World coordinate of the grid's (0, 0) cell. Together with width /
       # height / resolution, defines which world region the grid covers.
       # Increase: grid window shifts in the +x / +y direction.
       # Decrease: grid window shifts in the opposite direction.
-      origin_x: -62.5
-      origin_y: -43.75
+      origin_x: 0.0
+      origin_y: 0.0
 
       # Log-odds increment added to a cell when a scan ray ends in it
       # (i.e. cell is observed occupied).
@@ -135,14 +135,15 @@ occupancy_grid_mapper:
       # max_range Smaller: only nearby returns trusted, smaller built map.
       # min_range Larger: ignores closer returns (filters body reflections).
       # min_range Smaller: includes closer returns (risks self-hits).
-      max_range: 12.0
+      max_range: 3.0
       min_range: 0.1
 
     # See motion_model.lidar above for offsets.
     lidar:
       x_offset: 0.0
       y_offset: 0.0
-      yaw_offset: 0.0
+      # yaw_offset: 0.0
+      yaw_offset: 1.570
 
 
 # ====================================================================
@@ -150,8 +151,8 @@ occupancy_grid_mapper:
 # ====================================================================
 slam_node:
   ros__parameters:
-    scan_topic: "/succulence/scan"          # physical: "/scan"
-    odom_topic: "/succulence/odom"          # physical: "/odom"
+    scan_topic: "/scan"          # physical: "/scan"
+    odom_topic: "/odom"          # physical: "/odom"
 
     # Outputs from SLAM.
     map_topic: "/succulence/map"
@@ -165,21 +166,24 @@ slam_node:
       #   that are more likely to saturate the search window.
       # Smaller: more keyframes -> denser graph, more CPU per optimisation
       #   pass, but tighter local constraints.
-      keyframe_distance: 0.1
+      # keyframe_distance: 0.1
+      keyframe_distance: 0.05
 
       # Rotation between keyframes, in radians.
       # Larger: fewer keyframes during turns -> heading drift accumulates
       #   between corrections.
       # Smaller: keyframes during sharp turns -> better corrected heading,
       #   higher CPU.
-      keyframe_angle: 0.1
+      # keyframe_angle: 0.1
+      keyframe_angle: 0.05
 
       # Run graph optimisation every N keyframes.
       # Larger: optimiser runs less often -> cheaper but the live map can
       #   show drift longer before snapping.
       # Smaller: optimiser runs more often -> tighter map but more CPU and
       #   more frequent visual snaps.
-      optimization_interval: 5
+      #optimization_interval: 5
+      optimization_interval: 4
 
       # Gauss-Newton iterations per optimisation call.
       # Larger: more thorough convergence per call, more CPU per snap.
@@ -205,7 +209,7 @@ slam_node:
     lidar:
       x_offset: 0.0
       y_offset: 0.0
-      yaw_offset: 0.0
+      yaw_offset: 1.570
 
     # Alpha noise model used for odometry edges in the pose graph. Same
     # interpretation as in the motion_model node above.
@@ -225,7 +229,8 @@ slam_node:
       #   and the matcher will silently saturate at the boundary.
       search_x: 0.5
       search_y: 0.5
-      search_theta: 0.1
+      # search_theta: 0.1
+      search_theta: 0.2
 
       # Step size when sweeping the search window.
       # Larger: fewer candidates -> faster but coarser localisation.
@@ -233,7 +238,8 @@ slam_node:
       #   in xy and linear in theta.
       resolution_x: 0.025
       resolution_y: 0.025
-      resolution_theta: 0.02
+      # resolution_theta: 0.02
+      resolution_theta: 0.01
 
       # Minimum normalised correlation score for a scan-match to be
       # accepted as an edge.
@@ -258,16 +264,18 @@ slam_node:
     # See occupancy_grid_mapper.occupancy_grid above for what each value
     # means; values must match across nodes for consistent visualisation.
     occupancy_grid:
-      resolution: 0.10
-      width: 1250
-      height: 875
-      origin_x: -62.5
-      origin_y: -43.75
+      resolution: 0.05
+      width: 150
+      height: 150
+      origin_x: -3.0
+      origin_y: -3.0
       log_odds_occupied: 0.85
       log_odds_free: 0.4
-      log_odds_max: 5.0
-      log_odds_min: -5.0
-      max_range: 12.0
+      # log_odds_max: 5.0
+      log_odds_max: 8.0
+      # log_odds_min: -5.0
+      log_odds_min: -8.0
+      max_range: 3.0
       min_range: 0.1
 
 
@@ -290,7 +298,12 @@ planner_node:
       # Larger: stable plans, slower reaction to newly mapped obstacles.
       # Smaller: reacts faster but the path can visibly jitter as the
       #   map fills in.
-      replan_period: 1.0
+      #replan_period: 5.0
+      # max_linear_v    replan_period
+      #    0.25           4.0 - 5.0   #original
+      #    0.40           1.0 - 2.0
+      #    1.0            0.3 - 0.5
+      replan_period: 0.5
 
       # Cell value (0..100) at or above which a cell is treated as an
       # obstacle by A*.
@@ -315,14 +328,18 @@ planner_node:
       # Larger: paths stay further from obstacles; narrow gaps may
       #   inflate shut and become "no path".
       # Smaller: paths hug walls; rover may scrape corners.
-      inflation_radius_cells: 10
+      #inflation_radius_cells: 1.0
+      #inflation_radius_cells: 5.0
+      inflation_radius_cells: 3.7
 
     # Hardcoded mission goal (Kevin's location), in the map frame.
     # Increase x: goal moves east. Decrease x: goal moves west.
     # Increase y: goal moves north. Decrease y: goal moves south.
     goal:
-      x: 50.0
-      y: 3.0
+      #x: -1.0
+      x: 0.25
+      #y: 1.36
+      y: 2.35
 
 
 # ====================================================================
@@ -332,39 +349,45 @@ navigator_node:
   ros__parameters:
     plan_topic: "/succulence/plan"
     odom_topic: "/succulence/slam/odometry"
-    cmd_vel_topic: "/cmd_vel"
+    cmd_vel_topic: "/cmd_vel_unstamped"
 
     control:
       # Control loop rate in Hz. Twist commands are republished at this
       # rate.
       # Larger: smoother control, more CPU.
       # Smaller: jerkier control, less load.
-      rate_hz: 10.0
+      #rate_hz: 10.0
+      rate_hz: 15.0
 
       # Pure-pursuit lookahead distance in metres. The controller picks
       # the path point this far ahead of the rover and drives a circular
       # arc to it.
       # Larger: gentle, sweeping turns; cuts corners.
       # Smaller: aggressive, tight tracking of the path; can oscillate.
-      lookahead: 1.5
+      #lookahead: 1.5
+      #lookahead: 0.25
+      lookahead: 1.25
 
       # Maximum forward speed in m/s.
       # Larger: faster mission completion but stresses scan matching and
       #   widens turning radius at the controller.
       # Smaller: slower but safer; better localisation and tighter turns.
-      max_linear_v: 0.25
+      #max_linear_v: 0.25
+      max_linear_v: 1.0
 
       # Maximum angular speed in rad/s.
       # Larger: tighter turns possible at speed, harder on scan matching
       #   (rotation is the failure mode).
       # Smaller: rover spins more slowly; may struggle on sharp corners.
-      max_angular_v: 0.75
+      #max_angular_v: 0.15
+      max_angular_v: 0.6
 
       # Distance to the goal at which the navigator declares arrival
       # and stops.
       # Larger: stops further from the exact goal; more forgiving.
       # Smaller: stops closer; may overshoot or miss in noisy odometry.
-      goal_tolerance: 0.05
+      #goal_tolerance: 0.05
+      goal_tolerance: 0.1
 
       # Seconds without a fresh plan before the navigator stops the rover
       # as a safety fallback. Must comfortably exceed `replan_period`.

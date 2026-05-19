@@ -1,8 +1,29 @@
 """
-Pose Graph SLAM Launch (Week 11)
+Full Mission Stack Launch (Week 12)
+
+Launches SLAM + A* planner + pure-pursuit navigator together so the rover
+maps the world AND drives itself to the hardcoded goal (Kevin's location
+in params.yaml):
+
+    /scan, /odom
+         |
+         v
+    [ slam_node ] --> /succulence/map, /succulence/slam/odometry
+         |
+         v
+    [ planner_node (A*) ] --> /succulence/plan
+         |
+         v
+    [ navigator_node (pure pursuit) ] --> /cmd_vel
 
 Usage:
-    ros2 launch succulence_rover_ros slam.launch.py
+    ros2 launch succulence_rover_ros mission.launch.py
+
+In RViz2 (Fixed Frame: "map"), useful displays:
+  - Map        -> /succulence/map
+  - Path       -> /succulence/slam/path     (rover's optimised trajectory)
+  - Path       -> /succulence/plan          (A* plan to Kevin)
+  - Odometry   -> /succulence/slam/odometry
 """
 
 from launch import LaunchDescription
@@ -64,6 +85,22 @@ def generate_launch_description():
             package='succulence_rover_ros',
             executable='slam_node',
             name='slam_node',
+            output='screen',
+            parameters=[params_file],
+        ),
+
+        Node(
+            package='succulence_rover_ros',
+            executable='planner_node',
+            name='planner_node',
+            output='screen',
+            parameters=[params_file],
+        ),
+
+        Node(
+            package='succulence_rover_ros',
+            executable='navigator_node',
+            name='navigator_node',
             output='screen',
             parameters=[params_file],
         ),

@@ -1,8 +1,11 @@
 """
-Pose Graph SLAM Launch (Week 11)
+Pose Graph SLAM (SIM).
+
+Wired for the Unity Mars sim: succulence/* TF frames and /succulence/* topics.
+Uses params_sim.yaml.
 
 Usage:
-    ros2 launch succulence_rover_ros slam.launch.py
+    ros2 launch succulence_rover_ros slam_sim.launch.py
 """
 
 from launch import LaunchDescription
@@ -14,17 +17,17 @@ import os
 
 def generate_launch_description():
     config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
-    params_file = os.path.join(config_dir, 'params.yaml')
+    params_file = os.path.join(config_dir, 'params_sim.yaml')
 
     odom_frame_arg = DeclareLaunchArgument(
         'odom_frame', default_value='succulence/odom',
-        description='Odometry frame (change to "odom" for TurtleBot)')
+        description='Odometry frame')
     base_link_frame_arg = DeclareLaunchArgument(
         'base_link_frame', default_value='succulence/base_link',
-        description='Base link frame (change to "base_link" for TurtleBot)')
+        description='Base link frame')
     lidar_frame_arg = DeclareLaunchArgument(
         'lidar_frame', default_value='succulence/lidar_link',
-        description='Lidar frame (change to "base_scan" for TurtleBot)')
+        description='Lidar frame')
     map_frame_arg = DeclareLaunchArgument(
         'map_frame', default_value='map', description='Map frame')
 

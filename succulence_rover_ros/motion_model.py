@@ -75,16 +75,22 @@ def compute_motion_covariance(
     """
     # TODO: YOUR CODE HERE (~7 lines)
     dx, dy, dtheta = relative_pose
+    
+    # 1. delta_trans = sqrt(dx^2 + dy^2)       # how far we translated
     delta_trans = np.sqrt(dx**2 + dy**2)
+    
+    # 2. delta_rot   = |dtheta|                # how much we rotated
     delta_rot = np.abs(dtheta)
 
+    # 3. var_x     = alpha1 * delta_trans^2 + alpha2 * delta_rot^2
+    #    var_y     = alpha1 * delta_trans^2 + alpha2 * delta_rot^2
+    #    var_theta = alpha3 * delta_trans^2 + alpha4 * delta_rot^2
     var_x = alpha1 * delta_trans**2 + alpha2 * delta_rot**2
     var_y = alpha1 * delta_trans**2 + alpha2 * delta_rot**2
     var_theta = alpha3 * delta_trans**2 + alpha4 * delta_rot**2
 
-    cov = np.diag([var_x, var_y, var_theta])
-
-    return cov
+    # 4. return np.diag([var_x, var_y, var_theta])
+    return np.diag([var_x, var_y, var_theta])
 
 
 # ============================================================================

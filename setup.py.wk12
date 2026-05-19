@@ -34,9 +34,6 @@ setup(
             'occupancy_grid_mapper_node = succulence_rover_ros.occupancy_grid_mapper:main',
             # Week 11: Pose graph SLAM
             'slam_node = succulence_rover_ros.slam_node:main',
-            # Week 12: A* planner + pure-pursuit navigator
-            'planner_node = succulence_rover_ros.planner_node:main',
-            'navigator_node = succulence_rover_ros.navigator_node:main',
         ],
     },
 )

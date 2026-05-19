@@ -39,25 +39,29 @@ motion_model:
       # Larger: pose-uncertainty ellipse grows faster while driving forward,
       #   downstream filters trust odometry less. Smaller: tighter ellipse,
       #   more confidence in wheel odometry.
-      alpha1: 0.1
+      #alpha1: 0.1
+      alpha1: 0.0
 
       # alpha2 - Translation variance contributed by rotation. Models how
       # much the rover slides sideways while turning.
       # Larger: turns inject more positional uncertainty.
       # Smaller: rotation considered to leave position untouched.
-      alpha2: 0.05
-
+      #alpha2: 0.05
+      alpha2: 0.0
+      
       # alpha3 - Rotation variance contributed by translation. Models heading
       # drift while driving straight.
       # Larger: forward motion injects more heading uncertainty.
       # Smaller: heading is considered stable during straight-line motion.
-      alpha3: 0.05
+      #alpha3: 0.05
+      alpha3: 0.0
 
       # alpha4 - Rotation variance per unit rotation (yaw drift while
       # turning). Primary lever for heading uncertainty.
       # Larger: heading uncertainty grows quickly during turns.
       # Smaller: rover trusts its yaw more between observations.
-      alpha4: 0.2
+      #alpha4: 0.2
+      alpha4: 0.0
 
       # Maximum number of poses kept in the published Path message before
       # the oldest are dropped. Purely a visualisation cap.
@@ -210,10 +214,15 @@ slam_node:
     # Alpha noise model used for odometry edges in the pose graph. Same
     # interpretation as in the motion_model node above.
     motion_model:
-      alpha1: 0.1
-      alpha2: 0.05
-      alpha3: 0.05
-      alpha4: 0.2
+      #alpha1: 0.1
+      #alpha2: 0.05
+      #alpha3: 0.05
+      #alpha4: 0.2
+      alpha1: 0.0
+      alpha2: 0.0
+      alpha3: 0.0
+      alpha4: 0.0
+
 
     scan_matcher:
       # Half-width of the brute-force search window, per axis.

@@ -119,10 +119,13 @@ class OccupancyGrid:
             - col corresponds to x, row corresponds to y
         """
         # TODO: YOUR CODE HERE (2 lines)
+
         # col = cast to int (How far from the grid origin along x / cell size)
         col = int((x - self.origin_x) / self.resolution)
+
         # row = cast to int (How far from the grid origin along y / cell size)
         row = int((y - self.origin_y) / self.resolution)
+
         return row, col
 
     def grid_to_world(self, row: int, col: int) -> Tuple[float, float]:
